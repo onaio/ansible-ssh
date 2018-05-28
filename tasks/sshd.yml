@@ -1,0 +1,70 @@
+---
+- name: Create temporary directory for storing authorized CA keys
+  delegate_to: "127.0.0.1"
+  become: yes
+  become_user: "{{ ssh_local_user }}"
+  file:
+    path: "/tmp/{{ ssh_local_user }}"
+    state: directory
+    mode: "0700"
+    owner: "{{ ssh_local_user }}"
+    group: "{{ ssh_local_user }}"
+
+- name: Download authorized CA keys from Vault
+  delegate_to: "127.0.0.1"
+  become: yes
+  become_user: "{{ ssh_local_user }}"
+  shell:
+    cmd: "vault login -address={{ ssh_vault_url }} -method={{ ssh_vault_login_method }} && vault read -address={{ ssh_vault_url }} -field=public_key {{ item.src }}/config/ca > /tmp/{{ ssh_local_user }}/{{ item.name }}"
+  with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
+
+- name: Make sure the trusted CAs Directory exists
+  file:
+    path: "/etc/ssh/ca"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Copy the authorized CA keys
+  copy:
+    src: "/tmp/{{ ssh_local_user }}/{{ item.name }}"
+    dest: "/etc/ssh/ca/{{ item.name }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
+  notify:
+    - "reload ssh"
+
+- name: Set vaule for X11Forwarding
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "X11Forwarding {{ ssh_x11_forwarding }}"
+    regexp: '^X11Forwarding'
+  notify:
+    - "reload ssh"
+
+- name: Set vaule for MaxAuthTries
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "MaxAuthTries {{ ssh_max_auth_retries }}"
+    regexp: '^MaxAuthTries'
+  notify:
+    - "reload ssh"
+
+- name: Delete all the TrustedUserCAKeys from SSHD config
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: '^TrustedUserCAKeys'
+    state: absent
+  notify:
+    - "reload ssh"
+
+- name: Add trusted user CA certificate to SSHD config
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "TrustedUserCAKeys /etc/ssh/ca/{{ item.name }}"
+  with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
+  notify:
+    - "reload ssh"

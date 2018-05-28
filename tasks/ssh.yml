@@ -1,0 +1,7 @@
+---
+- name: Copy the authorized keys
+  authorized_key:
+    user: "{{ _ssh_user_name }}"
+    state: present
+    exclusive: yes
+    key: "{{ ssh_users[_ssh_user_name].authorized_keys|join('\n') }}"

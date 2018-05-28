@@ -1,0 +1,10 @@
+---
+ssh_x11_forwarding: "no"
+ssh_vault_trusted_user_ca_keys: []
+ssh_users:
+  ubuntu:
+    authorized_keys: []
+ssh_vault_login_method: "aws"
+ssh_vault_url: "http://127.0.0.1:8200"
+ssh_local_user: devops
+ssh_max_auth_retries: 15

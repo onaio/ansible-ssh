@@ -1,0 +1,7 @@
+---
+- include_tasks: ssh.yml
+  with_items: "{{ ssh_users }}"
+  loop_control:
+    loop_var: "_ssh_user_name"
+
+- include_tasks: sshd.yml
