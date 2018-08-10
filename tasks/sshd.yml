@@ -8,8 +8,7 @@
     state: directory
     mode: "0700"
     owner: "{{ ssh_local_user }}"
-    group: "{{ ssh_local_user }}"
-
+    
 - name: Download authorized CA keys from Vault
   delegate_to: "127.0.0.1"
   become: yes
