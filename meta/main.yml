@@ -1,0 +1,13 @@
+galaxy_info:
+  author: Ona Engineering
+  company: Ona Systems Inc
+  description: Make configuration changes to SSH
+  min_ansible_version: 2.4
+  license: MIT
+  platforms:
+    - name: Ubuntu
+      versions:
+        - 14.04
+        - 16.04
+  categories:
+    - ssh
