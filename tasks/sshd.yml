@@ -8,7 +8,7 @@
     state: directory
     mode: "0700"
     owner: "{{ ssh_local_user }}"
-    
+
 - name: Download authorized CA keys from Vault
   delegate_to: "127.0.0.1"
   become: yes
@@ -36,7 +36,7 @@
   notify:
     - "reload ssh"
 
-- name: Set vaule for X11Forwarding
+- name: Set value for X11Forwarding
   lineinfile:
     path: "/etc/ssh/sshd_config"
     line: "X11Forwarding {{ ssh_x11_forwarding }}"
@@ -44,7 +44,7 @@
   notify:
     - "reload ssh"
 
-- name: Set vaule for MaxAuthTries
+- name: Set value for MaxAuthTries
   lineinfile:
     path: "/etc/ssh/sshd_config"
     line: "MaxAuthTries {{ ssh_max_auth_retries }}"
