@@ -19,6 +19,22 @@
     AWS_PROFILE: "{{ ssh_aws_profile }}"
   with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
 
+- name: Make sure the temporary combined CA certs file doesn't exist
+  delegate_to: "127.0.0.1"
+  become: yes
+  become_user: "{{ ssh_local_user }}"
+  file:
+    path: "/tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
+    state: absent
+
+- name: Copy the downloaded CA keys to one file
+  delegate_to: "127.0.0.1"
+  become: yes
+  become_user: "{{ ssh_local_user }}"
+  shell:
+    cmd: "cur_ssh_cert=`cat /tmp/{{ ssh_local_user }}/{{ item.name }}` && cur_ssh_cert=\"${cur_ssh_cert} {{ item.name }}\" && echo \"${cur_ssh_cert}\" >> /tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
+  with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
+
 - name: Make sure the trusted CAs Directory exists
   file:
     path: "/etc/ssh/ca"
@@ -27,14 +43,13 @@
     group: root
     mode: "0755"
 
-- name: Copy the authorized CA keys
+- name: Copy the combined authrized CA certs file
   copy:
-    src: "/tmp/{{ ssh_local_user }}/{{ item.name }}"
-    dest: "/etc/ssh/ca/{{ item.name }}"
+    src: "/tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
+    dest: "/etc/ssh/ca/{{ ssh_ca_file }}"
     owner: "root"
     group: "root"
     mode: "0644"
-  with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
   notify:
     - "reload ssh"
 
@@ -62,10 +77,9 @@
   notify:
     - "reload ssh"
 
-- name: Add trusted user CA certificate to SSHD config
+- name: Add trusted user CA certificate file to SSHD config
   lineinfile:
     path: "/etc/ssh/sshd_config"
-    line: "TrustedUserCAKeys /etc/ssh/ca/{{ item.name }}"
-  with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
+    line: "TrustedUserCAKeys /etc/ssh/ca/{{ ssh_ca_file }}"
   notify:
     - "reload ssh"
