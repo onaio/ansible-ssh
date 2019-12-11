@@ -50,6 +50,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
+  when: ssh_vault_trusted_user_ca_keys|length > 0
   notify:
     - "reload ssh"
 
@@ -81,5 +82,6 @@
   lineinfile:
     path: "/etc/ssh/sshd_config"
     line: "TrustedUserCAKeys /etc/ssh/ca/{{ ssh_ca_file }}"
+  when: ssh_vault_trusted_user_ca_keys|length > 0
   notify:
     - "reload ssh"
