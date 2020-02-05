@@ -6,7 +6,7 @@ ssh_users:
     authorized_keys: []
 ssh_vault_login_method: "aws"
 ssh_vault_url: "http://127.0.0.1:8200"
-ssh_local_user: devops
+ssh_local_user: "{{ lookup('env','USER') }}"
 ssh_max_auth_retries: 15
 # The AWS profile the role should use when running the vault commands
 ssh_aws_profile: "default"
