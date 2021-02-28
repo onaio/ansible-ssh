@@ -11,3 +11,7 @@ galaxy_info:
         - 16.04
   categories:
     - ssh
+dependencies:
+  - role: dev-sec.ssh-hardening
+    vars:
+      sshd_moduli_minimum: "{{ ssh_sshd_moduli_minimum }}"
