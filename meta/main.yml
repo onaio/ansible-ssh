@@ -12,6 +12,6 @@ galaxy_info:
   categories:
     - ssh
 dependencies:
-  - role: dev-sec.ssh-hardening
+  - role: devsec.hardening.ssh_hardening
     vars:
       sshd_moduli_minimum: "{{ ssh_sshd_moduli_minimum }}"
