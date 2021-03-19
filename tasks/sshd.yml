@@ -1,7 +1,7 @@
 ---
 - name: Create temporary directory for storing authorized CA keys
   delegate_to: "127.0.0.1"
-  become: yes
+  become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
   file:
     path: "/tmp/{{ ssh_local_user }}"
@@ -11,7 +11,7 @@
 
 - name: Download authorized CA keys from Vault
   delegate_to: "127.0.0.1"
-  become: yes
+  become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
   shell:
     cmd: "vault login -address={{ ssh_vault_url }} -method={{ ssh_vault_login_method }} && vault read -address={{ ssh_vault_url }} -field=public_key {{ item.src }}/config/ca > /tmp/{{ ssh_local_user }}/{{ item.name }}"
@@ -21,7 +21,7 @@
 
 - name: Make sure the temporary combined CA certs file doesn't exist
   delegate_to: "127.0.0.1"
-  become: yes
+  become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
   file:
     path: "/tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
@@ -29,7 +29,7 @@
 
 - name: Copy the downloaded CA keys to one file
   delegate_to: "127.0.0.1"
-  become: yes
+  become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
   shell:
     cmd: "cur_ssh_cert=`cat /tmp/{{ ssh_local_user }}/{{ item.name }}` && cur_ssh_cert=\"${cur_ssh_cert} {{ item.name }}\" && echo \"${cur_ssh_cert}\" >> /tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
