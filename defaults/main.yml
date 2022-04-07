@@ -14,3 +14,5 @@ ssh_aws_profile: "default"
 # The name of the file to place CA certificates inside /etc/ssh/ca/
 ssh_ca_file: "authorized"
 ssh_sshd_moduli_minimum: 3071  # As recommended by Mozilla (March 2021) https://infosec.mozilla.org/guidelines/openssh
+ssh_sshd_custom_options: 
+  - "TrustedUserCAKeys /etc/ssh/ca/{{ ssh_ca_file }}"
