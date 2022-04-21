@@ -6,3 +6,31 @@
     exclusive: yes
     key: "{{ ssh_users[_ssh_user_name].authorized_keys|join('\n') }}"
   when: ssh_users[_ssh_user_name].authorized_keys | length > 0
+
+- name: Ensure dependencies are present
+  apt:
+    pkg:
+      - build-essential
+      - zlib1g-dev
+      - libssl-dev
+      - libpam0g-dev
+      - libselinux1-dev
+      - libkrb5-dev
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
+
+- name: Download OpenSSH tar file
+  ignore_errors: true
+  get_url:
+    url: "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-{{ openssh_server_version|default(8.4) }}p1.tar.gz"
+    dest: "/tmp/openssh-{{ openssh_server_version|default(8.4) }}p1.tar.gz"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
+
+- name: Install OpenSSH Server
+  ignore_errors: true
+  become: yes
+  become_user: root
+  shell: tar -xzf openssh-{{ openssh_server_version|default(8.4) }}p1.tar.gz && cd openssh-{{ openssh_server_version|default(8.4) }}p1 && ./configure --with-kerberos5 --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh && make && make install
+  args:
+    executable: /bin/bash
+    chdir: "/tmp"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
