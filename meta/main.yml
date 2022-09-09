@@ -15,6 +15,6 @@ dependencies:
   - role: devsec.hardening.ssh_hardening
     vars:
       sshd_moduli_minimum: "{{ ssh_sshd_moduli_minimum }}"
-      ssh_trusted_user_ca_keys_file: "{{ ssh_trusted_user_ca_keys_file }}"
-      ssh_max_auth_retries: "{{ ssh_max_auth_retries }}"
-      ssh_x11_forwarding: "{{ ssh_x11_forwarding }}"
+      sshd_custom_options: "{{ ssh_sshd_custom_options }}"
+      ssh_max_auth_retries: "{{ max_auth_retries }}"
+      ssh_x11_forwarding: "{{ x11_forwarding }}"
