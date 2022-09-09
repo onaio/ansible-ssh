@@ -15,4 +15,4 @@ dependencies:
   - role: devsec.hardening.ssh_hardening
     vars:
       sshd_moduli_minimum: "{{ ssh_sshd_moduli_minimum }}"
-      sshd_custom_options: "{{ ssh_sshd_custom_options }}"
+      ssh_trusted_user_ca_keys_file: "{{ ssh_trusted_user_ca_keys_file }}"
