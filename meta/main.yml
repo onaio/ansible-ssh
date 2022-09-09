@@ -16,3 +16,5 @@ dependencies:
     vars:
       sshd_moduli_minimum: "{{ ssh_sshd_moduli_minimum }}"
       ssh_trusted_user_ca_keys_file: "{{ ssh_trusted_user_ca_keys_file }}"
+      ssh_max_auth_retries: "{{ ssh_max_auth_retries }}"
+      ssh_x11_forwarding: "{{ ssh_x11_forwarding }}"

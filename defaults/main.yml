@@ -1,5 +1,4 @@
 ---
-ssh_x11_forwarding: "no"
 ssh_vault_trusted_user_ca_keys: []
 ssh_users:
   ubuntu:
@@ -8,10 +7,11 @@ ssh_vault_login_method: "aws"
 ssh_vault_url: "http://127.0.0.1:8200"
 ssh_become_local_user: yes
 ssh_local_user: "{{ lookup('env','USER') }}"
-ssh_max_auth_retries: 15
 # The AWS profile the role should use when running the vault commands
 ssh_aws_profile: "default"
 # The name of the file to place CA certificates inside /etc/ssh/ca/
 ssh_ca_file: "authorized"
+ssh_x11_forwarding: false
+ssh_max_auth_retries: 10
 ssh_sshd_moduli_minimum: 3071  # As recommended by Mozilla (March 2021) https://infosec.mozilla.org/guidelines/openssh
 ssh_trusted_user_ca_keys_file: "/etc/ssh/ca/{{ ssh_ca_file }}"

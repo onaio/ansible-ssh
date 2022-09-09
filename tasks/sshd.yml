@@ -43,7 +43,7 @@
     group: root
     mode: "0755"
 
-- name: Copy the combined authrized CA certs file
+- name: Copy the combined authorized CA certs file
   copy:
     src: "/tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
     dest: "/etc/ssh/ca/{{ ssh_ca_file }}"
@@ -51,21 +51,5 @@
     group: "root"
     mode: "0644"
   when: ssh_vault_trusted_user_ca_keys|length > 0
-  notify:
-    - "reload ssh"
-
-- name: Set value for X11Forwarding
-  lineinfile:
-    path: "/etc/ssh/sshd_config"
-    line: "X11Forwarding {{ ssh_x11_forwarding }}"
-    regexp: '^X11Forwarding'
-  notify:
-    - "reload ssh"
-
-- name: Set value for MaxAuthTries
-  lineinfile:
-    path: "/etc/ssh/sshd_config"
-    line: "MaxAuthTries {{ ssh_max_auth_retries }}"
-    regexp: '^MaxAuthTries'
   notify:
     - "reload ssh"
