@@ -1,11 +1,14 @@
 ---
 - name: Copy the authorized keys
   authorized_key:
-    user: "{{ _ssh_user_name }}"
+    user: "{{ item.key }}"
     state: present
     exclusive: yes
-    key: "{{ ssh_users[_ssh_user_name].authorized_keys|join('\n') }}"
-  when: ssh_users[_ssh_user_name].authorized_keys | length > 0
+    key: "{{ item.value.authorized_keys | join('\n') }}"
+  loop: "{{ ssh_users | dict2items }}"
+  when:
+    - item.value.authorized_keys is defined
+    - item.value.authorized_keys | length > 0
 
 - name: Ensure dependencies are present
   apt:
@@ -27,7 +30,7 @@
 
 - name: Install OpenSSH Server
   ignore_errors: true
-  become: yes
+  become: true
   become_user: root
   shell: tar -xzf openssh-{{ openssh_server_version|default(8.4) }}p1.tar.gz && cd openssh-{{ openssh_server_version|default(8.4) }}p1 && ./configure --with-kerberos5 --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh && make && make install
   args:
