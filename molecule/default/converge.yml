@@ -1,0 +1,21 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  vars:
+    ssh_become_local_user: false
+    ssh_users:
+      deploy:
+        authorized_keys:
+          - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl molecule"
+  pre_tasks:
+    - name: Install the OpenSSH server
+      ansible.builtin.apt:
+        name: openssh-server
+        update_cache: true
+
+    - name: Create the user that receives keys
+      ansible.builtin.user:
+        name: deploy
+  roles:
+    - role: ../../..

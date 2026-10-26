@@ -1,0 +1,28 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Read the deployed authorized keys
+      ansible.builtin.slurp:
+        src: /home/deploy/.ssh/authorized_keys
+      register: authorized_keys
+
+    - name: Assert the key was deployed
+      ansible.builtin.assert:
+        that:
+          - "'molecule' in (authorized_keys.content | b64decode)"
+
+    - name: Check the sshd configuration
+      ansible.builtin.command: sshd -t
+      changed_when: false
+
+    - name: Check the trusted CA directory exists
+      ansible.builtin.stat:
+        path: /etc/ssh/ca
+      register: ca_dir
+
+    - name: Assert the trusted CA directory exists
+      ansible.builtin.assert:
+        that:
+          - ca_dir.stat.isdir

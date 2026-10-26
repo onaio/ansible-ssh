@@ -1,4 +1,6 @@
 galaxy_info:
+  role_name: ssh
+  namespace: onaio
   author: Ona Engineering
   company: Ona Systems Inc
   description: Make configuration changes to SSH
@@ -7,8 +9,8 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - 14.04
-        - 16.04
+        - 22.04
+        - 24.04
   categories:
     - ssh
 dependencies:
