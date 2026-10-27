@@ -1,15 +1,18 @@
+---
 galaxy_info:
+  role_name: ssh
+  namespace: onaio
   author: Ona Engineering
   company: Ona Systems Inc
   description: Make configuration changes to SSH
-  min_ansible_version: 2.4
+  min_ansible_version: "2.4"
   license: MIT
   platforms:
     - name: Ubuntu
       versions:
-        - 14.04
-        - 16.04
-  categories:
+        - jammy
+        - noble
+  galaxy_tags:
     - ssh
 dependencies:
   - role: devsec.hardening.ssh_hardening

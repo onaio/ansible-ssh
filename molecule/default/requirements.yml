@@ -1,0 +1,5 @@
+---
+collections:
+  - name: devsec.hardening
+    version: 10.6.0
+  - name: ansible.posix
