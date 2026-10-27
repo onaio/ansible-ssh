@@ -3,7 +3,7 @@
   delegate_to: "127.0.0.1"
   become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
-  file:
+  ansible.builtin.file:
     path: "/tmp/{{ ssh_local_user }}"
     state: directory
     mode: "0700"
@@ -13,8 +13,12 @@
   delegate_to: "127.0.0.1"
   become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
-  shell:
-    cmd: "vault login -address={{ ssh_vault_url }} -method={{ ssh_vault_login_method }} && vault read -address={{ ssh_vault_url }} -field=public_key {{ item.src }}/config/ca > /tmp/{{ ssh_local_user }}/{{ item.name }}"
+  ansible.builtin.shell:
+    cmd: >-
+      vault login -address={{ ssh_vault_url }} -method={{ ssh_vault_login_method }} &&
+      vault read -address={{ ssh_vault_url }} -field=public_key {{ item.src }}/config/ca
+      > /tmp/{{ ssh_local_user }}/{{ item.name }}
+  changed_when: false
   environment:
     AWS_PROFILE: "{{ ssh_aws_profile }}"
   with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
@@ -23,7 +27,7 @@
   delegate_to: "127.0.0.1"
   become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
-  file:
+  ansible.builtin.file:
     path: "/tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
     state: absent
 
@@ -31,12 +35,16 @@
   delegate_to: "127.0.0.1"
   become: "{{ ssh_become_local_user }}"
   become_user: "{{ ssh_local_user }}"
-  shell:
-    cmd: "cur_ssh_cert=`cat /tmp/{{ ssh_local_user }}/{{ item.name }}` && cur_ssh_cert=\"${cur_ssh_cert} {{ item.name }}\" && echo \"${cur_ssh_cert}\" >> /tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
+  ansible.builtin.shell:
+    cmd: >-
+      cur_ssh_cert=`cat /tmp/{{ ssh_local_user }}/{{ item.name }}` &&
+      cur_ssh_cert="${cur_ssh_cert} {{ item.name }}" &&
+      echo "${cur_ssh_cert}" >> /tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}
+  changed_when: false
   with_items: "{{ ssh_vault_trusted_user_ca_keys }}"
 
 - name: Make sure the trusted CAs Directory exists
-  file:
+  ansible.builtin.file:
     path: "/etc/ssh/ca"
     state: directory
     owner: root
@@ -44,7 +52,7 @@
     mode: "0755"
 
 - name: Copy the combined authorized CA certs file
-  copy:
+  ansible.builtin.copy:
     src: "/tmp/{{ ssh_local_user }}/{{ ssh_ca_file }}"
     dest: "/etc/ssh/ca/{{ ssh_ca_file }}"
     owner: "root"

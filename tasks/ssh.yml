@@ -1,9 +1,9 @@
 ---
 - name: Copy the authorized keys
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ item.key }}"
     state: present
-    exclusive: yes
+    exclusive: true
     key: "{{ item.value.authorized_keys | join('\n') }}"
   loop: "{{ ssh_users | dict2items }}"
   when:
@@ -11,7 +11,7 @@
     - item.value.authorized_keys | length > 0
 
 - name: Ensure dependencies are present
-  apt:
+  ansible.builtin.apt:
     pkg:
       - build-essential
       - zlib1g-dev
@@ -21,18 +21,20 @@
       - libkrb5-dev
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
 
-- name: Download OpenSSH tar file
+# The OpenSSH source build only runs on Ubuntu 18.04
+- name: Download OpenSSH tar file  # noqa: ignore-errors risky-file-permissions
   ignore_errors: true
-  get_url:
-    url: "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-{{ openssh_server_version|default(8.4) }}p1.tar.gz"
-    dest: "/tmp/openssh-{{ openssh_server_version|default(8.4) }}p1.tar.gz"
+  ansible.builtin.get_url:
+    url: "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-{{ openssh_server_version | default(8.4) }}p1.tar.gz"
+    dest: "/tmp/openssh-{{ openssh_server_version | default(8.4) }}p1.tar.gz"
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
 
-- name: Install OpenSSH Server
+- name: Install OpenSSH Server  # noqa: ignore-errors command-instead-of-module no-changed-when
   ignore_errors: true
   become: true
   become_user: root
-  shell: tar -xzf openssh-{{ openssh_server_version|default(8.4) }}p1.tar.gz && cd openssh-{{ openssh_server_version|default(8.4) }}p1 && ./configure --with-kerberos5 --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh && make && make install
+  ansible.builtin.shell: tar -xzf openssh-{{ openssh_server_version | default(8.4) }}p1.tar.gz && cd openssh-{{ openssh_server_version | default(8.4) }}p1 &&
+    ./configure --with-kerberos5 --with-md5-passwords --with-pam --with-selinux --with-privsep-path=/var/lib/sshd/ --sysconfdir=/etc/ssh && make && make install
   args:
     executable: /bin/bash
     chdir: "/tmp"
